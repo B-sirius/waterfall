@@ -1,7 +1,7 @@
 "use strict";
 
 window.onload = function() {
-    waterfall('main', 'box');
+    waterfall('main','box');
     var dataInt = {
         'data': [{
             'src': 'img/1.jpg'
@@ -93,22 +93,35 @@ window.onload = function() {
     window.onscroll = function() {
         if (checkScrollSlide() && n < dataInt.data.length) {
             //将数据块渲染到页面尾部
-            var oBox = document.createElement('div');
-            oBox.className = 'box';
-            var oImg = document.createElement('img');
-            oImg.src = dataInt.data[n].src;
-            oBox.style.position = 'absolute';
-            oParent.appendChild(oBox);
-            oBox.appendChild(oImg);
-            minH = Math.min.apply(null, hArr);
-            index = getMinHIndex(hArr, minH);
-            console.log(oImg.offsetHeight);
-            hArr[index] += oBox.offsetHeight; //就是这里改变每列高度
-            getPosition(oBox, oParent);
-            ++n;
+            loadImg(dataInt.data[n].src, function() {
+                var oBox = document.createElement('div');
+                oBox.className = 'box animate';
+                oBox.style.position = 'absolute';
+                oBox.appendChild(this);
+                oParent.appendChild(oBox);
+                minH = Math.min.apply(null, hArr);
+                oParent.style.height = Math.max.apply(null, hArr) + 'px';
+                index = getMinHIndex(hArr, minH);
+                hArr[index] += oBox.offsetHeight; //就是这里改变每列高度
+                getPosition(oBox, oParent);
+                ++n;
+            });
         }
     }
 }
+
+//预加载img
+var loadImg = function(url, callback) {
+    var img = new Image();
+    img.src = url;
+    if (img.complete) {
+        callback.call(img);
+        return;
+    }
+    img.onload = function() {
+        callback.call(img);
+    }
+};
 
 var minH = 0;
 var index = 0;
@@ -116,7 +129,7 @@ var oParent = document.getElementById('main');
 var hArr = []; //存放每一列高度的数组
 var waterfall = function(parent, box) {
     //获取元素
-    var oBoxs = getByClass(oParent, 'box');
+    var oBoxs = getByClass(oParent, 'box animate');
     //计算整个页面所需列数
     var oBoxW = oBoxs[0].offsetWidth; //获取盒子的宽度值(包括内边距边框)
     var cols = Math.floor(oParent.offsetWidth / oBoxW) //获取页面列数
@@ -125,6 +138,7 @@ var waterfall = function(parent, box) {
             hArr.push(oBoxs[i].offsetHeight)
         } else {
             minH = Math.min.apply(null, hArr); //Math.min()方法只能求一个个数(1,2,3,4)这样的，所以不能直接以数组做参数，但是apply方法会把数组值一个个传入，因此就可以啦
+            oParent.style.height = Math.max.apply(null, hArr) + 'px';
             index = getMinHIndex(hArr, minH); //得到最低一列的位置标记
             oBoxs[i].style.position = 'absolute';
             oBoxs[i].style.top = minH + 'px';
@@ -132,7 +146,7 @@ var waterfall = function(parent, box) {
             hArr[index] += oBoxs[i].offsetHeight; //就是这里改变每列高度
         }
     }
-}
+};
 
 //封装确认元素位置的方法
 var getPosition = function(element, container) {
@@ -149,20 +163,20 @@ var getByClass = function(parent, clsName) {
         }
     }
     return boxArr;
-}
+};
 
 var getMinHIndex = function(arr, val) {
     for (var i = 0; i < arr.length; i++) {
         if (arr[i] == val)
             return i;
     }
-}
+};
 
 //检测是否具备滚动加载数据块的条件
 var checkScrollSlide = function() {
-    var oBoxs = getByClass(oParent, 'box');
-    var lastBoxH = oBoxs[oBoxs.length - 1].offsetTop + Math.floor(oBoxs[oBoxs.length - 1].offsetHeight + 200); //求最后一个盒子距页面顶端的高度
+    var oBoxs = getByClass(oParent, 'box animate');
+    var lastBoxH = oBoxs[oBoxs.length - 1].offsetTop + Math.floor(oBoxs[oBoxs.length - 1].offsetHeight); //求最后一个盒子距页面顶端的高度
     var scrollTop = document.body.scrollTop || document.documentElement.scrollTop;
     var height = window.innerHeight;
     return (lastBoxH < scrollTop + height) ? true : false;
-}
+};
