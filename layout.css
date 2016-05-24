@@ -1,0 +1,36 @@
+body{
+    margin: 0;
+    font-family: "微软雅黑";
+    background: #f2f2f2;
+}
+#main{
+    position: relative;
+    margin: auto;
+    height: 9000px;
+}
+h1{
+    text-align: center;
+    font-weight: normal;
+    color: rgb(126, 126, 126);
+    margin-bottom: 50px;
+    font-size: 3rem;
+}
+.box{
+    padding: 5px;
+    float: left;
+    width: 350px;
+}
+img{
+    width: 100%;
+}
+
+@media (min-width:1100px){
+    .col-big{
+        width: 1080px;
+    }
+}
+@media (max-width:1009px){
+    .col-sm{
+        width: 720px;
+    }
+}
